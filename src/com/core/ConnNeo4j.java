@@ -8,36 +8,47 @@ import java.util.*;
 
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
+import org.neo4j.graphdb.index.Index;
 import org.neo4j.kernel.impl.util.FileUtils;
 
 
 public class ConnNeo4j {
 	private static final String DB_PATH = "/Users/fanfeifan/Desktop/SocialNetwork";
-    static GraphDatabaseService graphDb;
-    static Map<String, Person> personMap = new HashMap<String, Person>();
-    Relationship myRelationship;
+    public static GraphDatabaseService graphDb;
+    public static Map<String, Person> personMap = new HashMap<String, Person>();
 
-    
-    public static void main( final String[] args )
-    {
-    
-        ConnNeo4j myNeoInstance = new ConnNeo4j();
-        myNeoInstance.createDb();
-        myNeoInstance.removeData();
-        myNeoInstance.shutDown();
-        
-    }
-    
-    @SuppressWarnings("deprecation")
 	public static
 	void createDb()
     {
     	clearDb();
     	graphDb = new GraphDatabaseFactory().newEmbeddedDatabase( DB_PATH );
     	registerShutdownHook( graphDb );
-    	
     	loadGraphFile();
     }
+	
+	public static void loadPersonNodes() {
+		clearDb();
+		graphDb = new GraphDatabaseFactory().newEmbeddedDatabase( DB_PATH );
+    	registerShutdownHook( graphDb );
+		if (!personMap.isEmpty()) return;
+		// START SNIPPET: transaction
+        try ( Transaction tx = graphDb.beginTx() )
+        {
+    		Label label = DynamicLabel.label( "User" );
+        	try ( ResourceIterator<Node> users =
+                    graphDb.findNodesByLabelAndProperty( label, "name", "").iterator() )
+            {
+                while ( users.hasNext() )
+                {
+                	Node node = users.next();
+                	Person personNode = new Person(node);
+                    personMap.put(node.getProperty("id").toString(), personNode);
+                }
+            }
+        	// START SNIPPET: transaction
+            tx.success();
+        }
+	}
     
 	// load social network from sample file
 	static void loadGraphFile() {
@@ -52,10 +63,6 @@ public class ConnNeo4j {
 			String line = null;
 			while ((line = reader1.readLine()) != null) {
 				String property[] = line.split("\" \"");
-//				for (int i = 0; i < property.length; i ++) {
-//					System.out.println(property[i]);
-//					
-//				}
 				// START SNIPPET: transaction
 		        try ( Transaction tx = graphDb.beginTx() )
 		        {
@@ -72,6 +79,9 @@ public class ConnNeo4j {
 					personNode.setProperty("favorite_toy", property[9]);
 					personNode.setProperty("favorite_activity", property[10]);
 					personNode.setProperty("favorite_food", property[11].substring(0,property[11].length()-1));
+					personNode.setProperty("passwd", "123456");
+					Label label = DynamicLabel.label("User");
+					personNode.addLabel(label);
 		            // add into hashmap
 					Person person = new Person(personNode);
 		            personMap.put(property[0].substring(1,property[0].length()), person);
@@ -138,6 +148,13 @@ public class ConnNeo4j {
 
             tx.success();
         }
+    }
+	public static void main( final String[] args )
+    {
+    
+//        ConnNeo4j.createDb();
+        ConnNeo4j.loadPersonNodes();
+        
     }
 	
 	void shutDown()

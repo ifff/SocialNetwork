@@ -53,7 +53,7 @@ public class Person
         this.underlyingNode = personNode;
     }
 
-    protected Node getUnderlyingNode()
+    public Node getUnderlyingNode()
     {
         return underlyingNode;
     }
