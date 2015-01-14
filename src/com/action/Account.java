@@ -1,52 +1,61 @@
 package com.action;
 
 import javax.servlet.http.HttpServletRequest;
+import com.core.*;
+import org.neo4j.graphdb.*;
+import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import javax.servlet.http.HttpServletResponse;
-
 import javax.servlet.http.HttpSession;
+
 import java.io.IOException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 
 import com.actionForm.AccountForm;
+import com.core.ConnNeo4j;
 import com.dao.AccountDAO;
 //import javax.jms.Session;
 
 public class Account extends HttpServlet {
-	private AccountDAO accountDAO = null; // ÉùÃ÷erDAOµÄ¶ÔÏó
+	private AccountDAO accountDAO = null; // ï¿½ï¿½ï¿½ï¿½erDAOï¿½Ä¶ï¿½ï¿½ï¿½
 
 	public Account() {
-		this.accountDAO = new AccountDAO(); // ÊµÀı»¯AccountDAOÀà
+		this.accountDAO = new AccountDAO(); // Êµï¿½ï¿½AccountDAOï¿½ï¿½
 	}
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String action = request.getParameter("action");
-		System.out.println("»ñÈ¡µÄ²éÑ¯×Ö·û´®£º" + action);
+		
+//	    ConnNeo4j neo = new ConnNeo4j();
+//	    System.out.println("-----------start load graph file-------");
+	    ConnNeo4j.createDb();
+		System.out.println("action name:" + action);
+		
 		if (action == null || "".equals(action)) {
 			request.getRequestDispatcher("error.jsp")
 					.forward(request, response);
-		} else if ("login".equals(action)) {// µ±actionÖµÎªloginÊ±£¬µ÷ÓÃAccountLogin()·½·¨ÑéÖ¤¹ÜÀíÔ±Éí·İ
+		} else if ("login".equals(action)) {// ï¿½ï¿½actionÖµÎªloginÊ±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½AccountLogin()ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¤ï¿½ï¿½ï¿½ï¿½Ô±ï¿½ï¿½ï¿½
 			AccountLogin(request, response);
 		} /*else if ("AccountAdd".equals(action)) {
-			AccountAdd(request, response);// Ìí¼Ó¹ÜÀíÔ±ĞÅÏ¢
+			AccountAdd(request, response);// ï¿½ï¿½Ó¹ï¿½ï¿½ï¿½Ô±ï¿½ï¿½Ï¢
 		} else if ("AccountQuery".equals(action)) {
-			AccountQuery(request, response);// ²éÑ¯¹ÜÀíÔ±¼°È¨ÏŞĞÅÏ¢
+			AccountQuery(request, response);// ï¿½ï¿½Ñ¯ï¿½ï¿½ï¿½ï¿½Ô±ï¿½ï¿½È¨ï¿½ï¿½ï¿½ï¿½Ï¢
 		} else if ("AccountModifyQuery".equals(action)) {
-			AccountModifyQuery(request, response);// ÉèÖÃ¹ÜÀíÔ±È¨ÏŞÊ±²éÑ¯¹ÜÀíÔ±ĞÅÏ¢
+			AccountModifyQuery(request, response);// ï¿½ï¿½ï¿½Ã¹ï¿½ï¿½ï¿½Ô±È¨ï¿½ï¿½Ê±ï¿½ï¿½Ñ¯ï¿½ï¿½ï¿½ï¿½Ô±ï¿½ï¿½Ï¢
 		} else if ("AccountModify".equals(action)) {
-			AccountModify(request, response);// ÉèÖÃ¹ÜÀíÔ±È¨ÏŞ
+			AccountModify(request, response);// ï¿½ï¿½ï¿½Ã¹ï¿½ï¿½ï¿½Ô±È¨ï¿½ï¿½
 		} else if ("AccountDel".equals(action)) {
-			AccountDel(request, response);// É¾³ı¹ÜÀíÔ±
+			AccountDel(request, response);// É¾ï¿½ï¿½ï¿½ï¿½ï¿½Ô±
 		} else if ("querypwd".equals(action)) {
-			pwdQuery(request, response);// ¸ü¸Ä¿ÚÁîÊ±Ó¦ÓÃµÄ²éÑ¯
+			pwdQuery(request, response);// ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½Ê±Ó¦ï¿½ÃµÄ²ï¿½Ñ¯
 		} else if ("modifypwd".equals(action)) {
-			modifypwd(request, response); // ¸ü¸Ä¿ÚÁî
+			modifypwd(request, response); // ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½
 		}*/
 	}
 
-	// ¹ÜÀíÔ±Éí·İÑéÖ¤
+	// ï¿½ï¿½ï¿½ï¿½Ô±ï¿½ï¿½ï¿½ï¿½ï¿½Ö¤
 
 	public void AccountLogin(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
@@ -59,12 +68,12 @@ public class Account extends HttpServlet {
 		HttpSession session_rand=request.getSession();
 		String rand = (String)session_rand.getAttribute("rand");
 		if(!rand.equals(request.getParameter("rand"))){
-			request.setAttribute("error", "ÄúÊäÈëµÄÑéÖ¤Âë´íÎó£¡");
+			request.setAttribute("error", "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¤ï¿½ï¿½ï¿½ï¿½ï¿½");
 			request.getRequestDispatcher("error.jsp")
-					.forward(request, response);//×ªµ½´íÎóÌáÊ¾Ò³
+					.forward(request, response);//×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾Ò³
 		}
 		else{
-			int ret = accountDAO.checkAccount(accountForm);//µ÷ÓÃAccountDAOÀàµÄcheckAccount()·½·¨
+			int ret = accountDAO.checkAccount(accountForm);//ï¿½ï¿½ï¿½ï¿½AccountDAOï¿½ï¿½ï¿½checkAccount()ï¿½ï¿½ï¿½ï¿½
 			if (ret == 1) {
 				String accountType = accountDAO.getAccountType(accountForm);
 	            HttpSession session=request.getSession();
@@ -80,14 +89,14 @@ public class Account extends HttpServlet {
 	            	response.sendRedirect("Admin/index.jsp");
 	            }
 			} else {
-				request.setAttribute("error", "ÄúÊäÈëµÄÕË»§Ãû»òÃÜÂë´íÎó£¡");
+				request.setAttribute("error", "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½");
 				request.getRequestDispatcher("error.jsp")
-						.forward(request, response);//×ªµ½´íÎóÌáÊ¾Ò³
+						.forward(request, response);//×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾Ò³
 			}
 		}
 	}
 
-	// ²éÑ¯¹ÜÀíÔ±ĞÅÏ¢
+	// ï¿½ï¿½Ñ¯ï¿½ï¿½ï¿½ï¿½Ô±ï¿½ï¿½Ï¢
 /*	private void AccountQuery(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 		String str = null;
@@ -95,99 +104,99 @@ public class Account extends HttpServlet {
 		request.getRequestDispatcher("Account.jsp").forward(request, response);
 	}*/
 
-	// Ìí¼Ó¹ÜÀíÔ±ĞÅÏ¢
+	// ï¿½ï¿½Ó¹ï¿½ï¿½ï¿½Ô±ï¿½ï¿½Ï¢
 	/*private void AccountAdd(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 		AccountForm accountForm = new AccountForm();
-		accountForm.setName(request.getParameter("name")); // »ñÈ¡ÉèÖÃ¹ÜÀíÔ±Ãû³Æ
-		accountForm.setPwd(request.getParameter("pwd")); // »ñÈ¡²¢ÉèÖÃÃÜÂë
-		int ret = AccountDAO.insert(accountForm); // µ÷ÓÃÌí¼Ó¹ÜÀíÔ±ĞÅÏ¢
+		accountForm.setName(request.getParameter("name")); // ï¿½ï¿½È¡ï¿½ï¿½ï¿½Ã¹ï¿½ï¿½ï¿½Ô±ï¿½ï¿½ï¿½
+		accountForm.setPwd(request.getParameter("pwd")); // ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+		int ret = AccountDAO.insert(accountForm); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¹ï¿½ï¿½ï¿½Ô±ï¿½ï¿½Ï¢
 		if (ret == 1) {
 			request.getRequestDispatcher("Account_ok.jsp?para=1").forward(
-					request, response); // ×ªµ½¹ÜÀíÔ±ĞÅÏ¢Ìí¼Ó³É¹¦Ò³Ãæ
+					request, response); // ×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô±ï¿½ï¿½Ï¢ï¿½ï¿½Ó³É¹ï¿½Ò³ï¿½ï¿½
 
 		} else if (ret == 2) {
-			request.setAttribute("error", "¸Ã¹ÜÀíÔ±ĞÅÏ¢ÒÑ¾­Ìí¼Ó£¡"); // ½«´íÎóĞÅÏ¢±£´æµ½error²ÎÊıÖĞ
+			request.setAttribute("error", "ï¿½Ã¹ï¿½ï¿½ï¿½Ô±ï¿½ï¿½Ï¢ï¿½Ñ¾ï¿½ï¿½ï¿½Ó£ï¿½"); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½æµ½errorï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			request.getRequestDispatcher("error.jsp")
-					.forward(request, response); // ×ªµ½´íÎóÌáÊ¾Ò³Ãæ
+					.forward(request, response); // ×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾Ò³ï¿½ï¿½
 		} else {
-			request.setAttribute("error", "Ìí¼Ó¹ÜÀíÔ±ĞÅÏ¢Ê§°Ü£¡"); // ½«´íÎóĞÅÏ¢±£´æµ½error²ÎÊıÖĞ
+			request.setAttribute("error", "ï¿½ï¿½Ó¹ï¿½ï¿½ï¿½Ô±ï¿½ï¿½Ï¢Ê§ï¿½Ü£ï¿½"); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½æµ½errorï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			request.getRequestDispatcher("error.jsp")
-					.forward(request, response); // ×ªµ½´íÎóÌáÊ¾Ò³Ãæ
+					.forward(request, response); // ×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾Ò³ï¿½ï¿½
 		}
 	}*/
 
-	// ²éÑ¯ĞŞ¸Ä¹ÜÀíÔ±ĞÅÏ¢
+	// ï¿½ï¿½Ñ¯ï¿½Ş¸Ä¹ï¿½ï¿½ï¿½Ô±ï¿½ï¿½Ï¢
 	/*private void AccountModifyQuery(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 		AccountForm AccountForm = new AccountForm();
-		AccountForm.setId(Integer.valueOf(request.getParameter("id")));// »ñÈ¡²¢ÉèÖÃ¹ÜÀíIDºÅ
-		System.out.print("²éÑ¯µ½µÄid:" + request.getParameter("id"));
+		AccountForm.setId(Integer.valueOf(request.getParameter("id")));// ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½Ã¹ï¿½ï¿½ï¿½IDï¿½ï¿½
+		System.out.print("ï¿½ï¿½Ñ¯ï¿½ï¿½ï¿½ï¿½id:" + request.getParameter("id"));
 		request.setAttribute("AccountQueryif", AccountDAO
 				.query_update(AccountForm));
 		request.getRequestDispatcher("Account_Modify.jsp").forward(request,
-				response); // ×ªµ½È¨ÏŞÉèÖÃ³É¹¦Ò³Ãæ
+				response); // ×ªï¿½ï¿½È¨ï¿½ï¿½ï¿½ï¿½ï¿½Ã³É¹ï¿½Ò³ï¿½ï¿½
 	}
 
-	// ĞŞ¸ÄÃÜÂëÊ±²éÑ¯
+	// ï¿½Ş¸ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½Ñ¯
 	private void pwdQuery(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 		AccountForm AccountForm = new AccountForm();
 		HttpSession session = request.getSession();
 		String Account = (String) session.getAttribute("Account");
 		AccountForm.setName(Account);
-		System.out.print("²éÑ¯µ½µÄAccount:" + Account);
+		System.out.print("ï¿½ï¿½Ñ¯ï¿½ï¿½ï¿½ï¿½Account:" + Account);
 		request.setAttribute("pwdQueryif", AccountDAO.query_pwd(AccountForm));
 		request.getRequestDispatcher("pwd_Modify.jsp").forward(request,
 				response);
 	}
 
-	// ¹ÜÀíÔ±È¨ÏŞÉèÖÃ
+	// ï¿½ï¿½ï¿½ï¿½Ô±È¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	private void AccountModify(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 		AccountForm AccountForm = new AccountForm();
-		AccountForm.setId(Integer.parseInt(request.getParameter("id"))); // »ñÈ¡²¢ÉèÖÃ¹ÜÀíÔ±IDºÅ
-		AccountForm.setName(request.getParameter("name")); // »ñÈ¡²¢ÉèÖÃ¹ÜÀíÔ±Ãû³Æ
-		AccountForm.setPwd(request.getParameter("pwd")); // »ñÈ¡²¢ÉèÖÃ¹ÜÀíÔ±ÃÜÂë
+		AccountForm.setId(Integer.parseInt(request.getParameter("id"))); // ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½Ã¹ï¿½ï¿½ï¿½Ô±IDï¿½ï¿½
+		AccountForm.setName(request.getParameter("name")); // ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½Ã¹ï¿½ï¿½ï¿½Ô±ï¿½ï¿½ï¿½
+		AccountForm.setPwd(request.getParameter("pwd")); // ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½Ã¹ï¿½ï¿½ï¿½Ô±ï¿½ï¿½ï¿½ï¿½
 		AccountForm.setSysset(request.getParameter("sysset") == null ? 0
-				: Integer.parseInt(request.getParameter("sysset"))); // »ñÈ¡²¢ÉèÖÃÏµÍ³ÉèÖÃÈ¨ÏŞ
+				: Integer.parseInt(request.getParameter("sysset"))); // ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÏµÍ³ï¿½ï¿½ï¿½ï¿½È¨ï¿½ï¿½
 		AccountForm.setReaderset(request.getParameter("readerset") == null ? 0
-				: Integer.parseInt(request.getParameter("readerset"))); // »ñÈ¡²¢ÉèÖÃ¶ÁÕß¹ÜÀíÈ¨ÏŞ
+				: Integer.parseInt(request.getParameter("readerset"))); // ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½Ã¶ï¿½ï¿½ß¹ï¿½ï¿½ï¿½È¨ï¿½ï¿½
 		AccountForm.setBookset(request.getParameter("bookset") == null ? 0
-				: Integer.parseInt(request.getParameter("bookset"))); // »ñÈ¡²¢ÉèÖÃÍ¼Êé¹ÜÀíÈ¨ÏŞ
+				: Integer.parseInt(request.getParameter("bookset"))); // ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½ï¿½È¨ï¿½ï¿½
 		AccountForm
 				.setBorrowback(request.getParameter("borrowback") == null ? 0
-						: Integer.parseInt(request.getParameter("borrowback"))); // »ñÈ¡²¢ÉèÖÃÍ¼Êé½è»¹È¨ÏŞ
+						: Integer.parseInt(request.getParameter("borrowback"))); // ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½è»¹È¨ï¿½ï¿½
 		AccountForm.setSysquery(request.getParameter("sysquery") == null ? 0
-				: Integer.parseInt(request.getParameter("sysquery"))); // »ñÈ¡²¢ÉèÖÃÏµÍ³²éÑ¯È¨ÏŞ
-		int ret = AccountDAO.update(AccountForm); // µ÷ÓÃÉèÖÃ¹ÜÀíÔ±È¨ÏŞµÄ·½·¨
+				: Integer.parseInt(request.getParameter("sysquery"))); // ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÏµÍ³ï¿½ï¿½Ñ¯È¨ï¿½ï¿½
+		int ret = AccountDAO.update(AccountForm); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¹ï¿½ï¿½ï¿½Ô±È¨ï¿½ŞµÄ·ï¿½ï¿½ï¿½
 		if (ret == 0) {
-			request.setAttribute("error", "ÉèÖÃ¹ÜÀíÔ±È¨ÏŞÊ§°Ü£¡"); // ±£´æ´íÎóÌáÊ¾ĞÅÏ¢µ½error²ÎÊıÖĞ
+			request.setAttribute("error", "ï¿½ï¿½ï¿½Ã¹ï¿½ï¿½ï¿½Ô±È¨ï¿½ï¿½Ê§ï¿½Ü£ï¿½"); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½Ï¢ï¿½ï¿½errorï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			request.getRequestDispatcher("error.jsp")
-					.forward(request, response); // ×ªµ½´íÎóÌáÊ¾Ò³Ãæ
+					.forward(request, response); // ×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾Ò³ï¿½ï¿½
 		} else {
 			request.getRequestDispatcher("Account_ok.jsp?para=2").forward(
-					request, response);// ×ªµ½È¨ÏŞÉèÖÃ³É¹¦Ò³Ãæ
+					request, response);// ×ªï¿½ï¿½È¨ï¿½ï¿½ï¿½ï¿½ï¿½Ã³É¹ï¿½Ò³ï¿½ï¿½
 		}
 	}
 
-	// É¾³ı¹ÜÀíÔ±ĞÅÏ¢
+	// É¾ï¿½ï¿½ï¿½ï¿½ï¿½Ô±ï¿½ï¿½Ï¢
 	private void AccountDel(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 		AccountForm AccountForm = new AccountForm();
-		AccountForm.setId(Integer.valueOf(request.getParameter("id"))); // »ñÈ¡²¢ÉèÖÃ¹ÜÀíÔ±IDºÅ
-		int ret = AccountDAO.delete(AccountForm); // µ÷ÓÃÉ¾³ıĞÅÏ¢µÄ·½·¨delete()
+		AccountForm.setId(Integer.valueOf(request.getParameter("id"))); // ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½Ã¹ï¿½ï¿½ï¿½Ô±IDï¿½ï¿½
+		int ret = AccountDAO.delete(AccountForm); // ï¿½ï¿½ï¿½ï¿½É¾ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½Ä·ï¿½ï¿½ï¿½delete()
 		if (ret == 0) {
-			request.setAttribute("error", "É¾³ı¹ÜÀíÔ±ĞÅÏ¢Ê§°Ü£¡"); // ±£´æ´íÎóÌáÊ¾ĞÅÏ¢µ½error²ÎÊıÖĞ
+			request.setAttribute("error", "É¾ï¿½ï¿½ï¿½ï¿½ï¿½Ô±ï¿½ï¿½Ï¢Ê§ï¿½Ü£ï¿½"); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½Ï¢ï¿½ï¿½errorï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			request.getRequestDispatcher("error.jsp")
-					.forward(request, response); // ×ªµ½´íÎóÌáÊ¾Ò³Ãæ
+					.forward(request, response); // ×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾Ò³ï¿½ï¿½
 		} else {
 			request.getRequestDispatcher("Account_ok.jsp?para=3").forward(
-					request, response); // ×ªµ½É¾³ı¹ÜÀíÔ±ĞÅÏ¢³É¹¦Ò³Ãæ
+					request, response); // ×ªï¿½ï¿½É¾ï¿½ï¿½ï¿½ï¿½ï¿½Ô±ï¿½ï¿½Ï¢ï¿½É¹ï¿½Ò³ï¿½ï¿½
 		}
 	}
 
-	// ĞŞ¸Ä¹ÜÀíÔ±ÃÜÂë
+	// ï¿½Ş¸Ä¹ï¿½ï¿½ï¿½Ô±ï¿½ï¿½ï¿½ï¿½
 	private void modifypwd(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 		AccountForm AccountForm = new AccountForm();
@@ -195,7 +204,7 @@ public class Account extends HttpServlet {
 		AccountForm.setPwd(request.getParameter("pwd"));
 		int ret = AccountDAO.updatePwd(AccountForm);
 		if (ret == 0) {
-			request.setAttribute("error", "¸ü¸Ä¿ÚÁîÊ§°Ü£¡");
+			request.setAttribute("error", "ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½Ê§ï¿½Ü£ï¿½");
 			request.getRequestDispatcher("error.jsp")
 					.forward(request, response);
 		} else {

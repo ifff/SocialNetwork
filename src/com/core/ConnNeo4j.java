@@ -4,6 +4,7 @@ package com.core;
 import com.core.*;
 
 import java.io.*;
+import java.util.*;
 
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
@@ -12,11 +13,8 @@ import org.neo4j.kernel.impl.util.FileUtils;
 
 public class ConnNeo4j {
 	private static final String DB_PATH = "/Users/fanfeifan/Desktop/SocialNetwork";
-
-    String myString;
-    GraphDatabaseService graphDb;
-    Node myFirstNode;
-    Node mySecondNode;
+    static GraphDatabaseService graphDb;
+    static Map<String, Person> personMap = new HashMap<String, Person>();
     Relationship myRelationship;
 
     
@@ -31,7 +29,7 @@ public class ConnNeo4j {
     }
     
     @SuppressWarnings("deprecation")
-	public
+	public static
 	void createDb()
     {
     	clearDb();
@@ -42,22 +40,27 @@ public class ConnNeo4j {
     }
     
 	// load social network from sample file
-	void loadGraphFile() {
+	static void loadGraphFile() {
 		// load Person configure
-		System.out.println("start read file");
+//		System.out.println("start read file");
 		File personFile = new File("/Users/fanfeifan/Documents/Develop/SocialNetwork/WebRoot/Database/petster-hamster/ent.petster-hamster");
+		File relationFile = new File("/Users/fanfeifan/Documents/Develop/SocialNetwork/WebRoot/Database/petster-hamster/out.petster-hamster");
 		BufferedReader reader1 = null;
-//		BufferedReader reader2 = null;
+		BufferedReader reader2 = null;
 		try {
 			reader1 = new BufferedReader(new FileReader(personFile));
 			String line = null;
 			while ((line = reader1.readLine()) != null) {
 				String property[] = line.split("\" \"");
+//				for (int i = 0; i < property.length; i ++) {
+//					System.out.println(property[i]);
+//					
+//				}
 				// START SNIPPET: transaction
 		        try ( Transaction tx = graphDb.beginTx() )
 		        {
 					Node personNode = graphDb.createNode();
-					personNode.setProperty("id", property[0]);
+					personNode.setProperty("id", property[0].substring(1,property[0].length()));
 					personNode.setProperty("name", property[1]);
 					personNode.setProperty("joined", property[2]);
 					personNode.setProperty("species", property[3]);
@@ -68,18 +71,32 @@ public class ConnNeo4j {
 					personNode.setProperty("hometown", property[8]);
 					personNode.setProperty("favorite_toy", property[9]);
 					personNode.setProperty("favorite_activity", property[10]);
-					personNode.setProperty("favorite_food", property[11]);
-		            // START SNIPPET: transaction
+					personNode.setProperty("favorite_food", property[11].substring(0,property[11].length()-1));
+		            // add into hashmap
+					Person person = new Person(personNode);
+		            personMap.put(property[0].substring(1,property[0].length()), person);
+					// START SNIPPET: transaction
 		            tx.success();
 		        }
 		        // END SNIPPET: transaction
-				for (int i = 0; i < property.length; i ++) {
-					System.out.println(property[i]);
-					
-				}
-				break;
-//				break;
 			}
+			// START SNIPPET: transaction
+	        try ( Transaction tx = graphDb.beginTx() )
+	        {
+				// load relationship
+				reader2 = new BufferedReader(new FileReader(relationFile));
+				while ((line = reader2.readLine()) != null) {
+					String relation[] = line.split(" ");
+					if (!personMap.containsKey(relation[0]) || !personMap.containsKey(relation[1]))
+						continue;
+					Person person1 = personMap.get(relation[0]);
+					Person person2 = personMap.get(relation[1]);
+//					System.out.println("add friend..."+relation[0]+','+relation[1]);
+					person1.addFriend(person2);
+				}
+	            tx.success();
+	        }
+	        // END SNIPPET: transaction
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
@@ -94,7 +111,7 @@ public class ConnNeo4j {
 		}
 	}
 	
-	private void clearDb()
+	private static void clearDb()
     {
         try
         {
