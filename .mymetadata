@@ -5,7 +5,7 @@
   id="myeclipse.1368080705579"
   context-root="/StudentManagementSystem"
   j2ee-spec="5.0"
-  archive="StudentManagementSystem.war">
+  archive=".war">
   <attributes>
     <attribute name="webrootdir" value="WebRoot" />
   </attributes>

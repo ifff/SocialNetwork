@@ -197,7 +197,7 @@ public class Person
         return new FriendsStatusUpdateIterator( this );
     }
 
-    public void addStatus( String text )
+    public void addStatus( String text , String picturePath)
     {
         StatusUpdate oldStatus;
         if ( getStatus().iterator().hasNext() )
@@ -208,7 +208,7 @@ public class Person
             oldStatus = null;
         }
 
-        Node newStatus = createNewStatusNode( text );
+        Node newStatus = createNewStatusNode( text , picturePath);
 
         if ( oldStatus != null )
         {
@@ -224,11 +224,12 @@ public class Person
         return underlyingNode.getGraphDatabase();
     }
 
-    private Node createNewStatusNode( String text )
+    private Node createNewStatusNode( String text , String picturePath)
     {
         Node newStatus = graphDb().createNode();
         newStatus.setProperty( StatusUpdate.TEXT, text );
         newStatus.setProperty( StatusUpdate.DATE, new Date().getTime() );
+        newStatus.setProperty( StatusUpdate.PICTURE, picturePath);
         return newStatus;
     }
 

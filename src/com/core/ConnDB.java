@@ -18,6 +18,7 @@ public class ConnDB {
 	  }
 
 	  public static Connection getConnection() {
+		    
 	    Connection conn = null;
 	    try {
 	      Class.forName(dbClassName).newInstance();

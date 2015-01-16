@@ -36,6 +36,7 @@ public class StatusUpdate
 {
     private final Node underlyingNode;
     static final String TEXT = "TEXT";
+    static final String PICTURE = "PICTURE";
     static final String DATE = "DATE";
 
     public StatusUpdate( Node underlyingNode )
@@ -71,6 +72,11 @@ public class StatusUpdate
     public String getStatusText()
     {
         return (String) underlyingNode.getProperty( TEXT );
+    }
+    
+    public String getStatusPicturePath() 
+    {
+    	return (String) underlyingNode.getProperty( PICTURE );
     }
 
     public Date getDate()

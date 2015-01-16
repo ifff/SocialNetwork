@@ -14,29 +14,43 @@ import org.neo4j.kernel.impl.util.FileUtils;
 
 public class ConnNeo4j {
 	private static final String DB_PATH = "/Users/fanfeifan/Desktop/SocialNetwork";
-    public static GraphDatabaseService graphDb;
-    public static Map<String, Person> personMap = new HashMap<String, Person>();
+    private static GraphDatabaseService graphDb = null;
+    private static Map<String, Person> personMap = new HashMap<String, Person>();
 
 	public static
 	void createDb()
     {
     	clearDb();
     	graphDb = new GraphDatabaseFactory().newEmbeddedDatabase( DB_PATH );
-    	registerShutdownHook( graphDb );
+    	//registerShutdownHook( graphDb );
     	loadGraphFile();
     }
 	
+	public static GraphDatabaseService getGraphDb() {
+		if (graphDb == null) {
+			graphDb = new GraphDatabaseFactory().newEmbeddedDatabase( DB_PATH );
+			//registerShutdownHook( graphDb );
+		}
+		return graphDb;
+	}
+	
+	public static Map<String, Person> getPersonMap() {
+		if (personMap.isEmpty()) {
+			loadPersonNodes();
+		}
+		return personMap;
+	}
+	
 	public static void loadPersonNodes() {
-		clearDb();
-		graphDb = new GraphDatabaseFactory().newEmbeddedDatabase( DB_PATH );
-    	registerShutdownHook( graphDb );
-		if (!personMap.isEmpty()) return;
+//		clearDb();
+//		graphDb = getGraphDb();
+//		if (!personMap.isEmpty()) return;
 		// START SNIPPET: transaction
-        try ( Transaction tx = graphDb.beginTx() )
+        try ( Transaction tx = getGraphDb().beginTx() )
         {
     		Label label = DynamicLabel.label( "User" );
         	try ( ResourceIterator<Node> users =
-                    graphDb.findNodesByLabelAndProperty( label, "name", "").iterator() )
+        			getGraphDb().findNodesByLabelAndProperty( label, "type", "user").iterator() )
             {
                 while ( users.hasNext() )
                 {
@@ -80,6 +94,7 @@ public class ConnNeo4j {
 					personNode.setProperty("favorite_activity", property[10]);
 					personNode.setProperty("favorite_food", property[11].substring(0,property[11].length()-1));
 					personNode.setProperty("passwd", "123456");
+					personNode.setProperty("type", "user");
 					Label label = DynamicLabel.label("User");
 					personNode.addLabel(label);
 		            // add into hashmap

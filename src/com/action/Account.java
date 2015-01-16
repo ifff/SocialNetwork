@@ -18,82 +18,57 @@ import com.dao.AccountDAO;
 //import javax.jms.Session;
 
 public class Account extends HttpServlet {
-	private AccountDAO accountDAO = null; // ����erDAO�Ķ���
+	private AccountDAO accountDAO = null; 
 
 	public Account() {
-		this.accountDAO = new AccountDAO(); // ʵ��AccountDAO��
+		this.accountDAO = new AccountDAO();
 	}
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String action = request.getParameter("action");
-		
-//	    ConnNeo4j neo = new ConnNeo4j();
-//	    System.out.println("-----------start load graph file-------");
-	    ConnNeo4j.createDb();
-		System.out.println("action name:" + action);
-		
+
 		if (action == null || "".equals(action)) {
 			request.getRequestDispatcher("error.jsp")
 					.forward(request, response);
-		} else if ("login".equals(action)) {// ��actionֵΪloginʱ������AccountLogin()������֤����Ա���
+		} else if ("login".equals(action)) {
 			AccountLogin(request, response);
-		} /*else if ("AccountAdd".equals(action)) {
-			AccountAdd(request, response);// ��ӹ���Ա��Ϣ
-		} else if ("AccountQuery".equals(action)) {
-			AccountQuery(request, response);// ��ѯ����Ա��Ȩ����Ϣ
-		} else if ("AccountModifyQuery".equals(action)) {
-			AccountModifyQuery(request, response);// ���ù���ԱȨ��ʱ��ѯ����Ա��Ϣ
-		} else if ("AccountModify".equals(action)) {
-			AccountModify(request, response);// ���ù���ԱȨ��
-		} else if ("AccountDel".equals(action)) {
-			AccountDel(request, response);// ɾ�����Ա
-		} else if ("querypwd".equals(action)) {
-			pwdQuery(request, response);// ��Ŀ���ʱӦ�õĲ�ѯ
-		} else if ("modifypwd".equals(action)) {
-			modifypwd(request, response); // ��Ŀ���
-		}*/
+		} 
 	}
 
-	// ����Ա�����֤
+
 
 	public void AccountLogin(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 		AccountForm accountForm = new AccountForm();
-		accountForm.setName(request.getParameter("name"));
+		accountForm.setId(request.getParameter("name"));
 		accountForm.setPwd(request.getParameter("pwd"));
-		accountForm.setRand(request.getParameter("rand"));
-		
-		System.out.println(accountForm.getName() + accountForm.getPwd() + accountForm.getRand());
-		HttpSession session_rand=request.getSession();
-		String rand = (String)session_rand.getAttribute("rand");
-		if(!rand.equals(request.getParameter("rand"))){
-			request.setAttribute("error", "���������֤�����");
-			request.getRequestDispatcher("error.jsp")
-					.forward(request, response);//ת��������ʾҳ
-		}
-		else{
-			int ret = accountDAO.checkAccount(accountForm);//����AccountDAO���checkAccount()����
+//		accountForm.setRand(request.getParameter("rand"));
+		System.out.println("id:"+request.getParameter("name")+",pwd:"+request.getParameter("pwd"));
+//		//System.out.println(accountForm.getName() + accountForm.getPwd() + accountForm.getRand());
+//		HttpSession session_rand=request.getSession();
+//		String rand = (String)session_rand.getAttribute("rand");
+//		if(!rand.equals(request.getParameter("rand"))){
+//			request.setAttribute("error", "验证码输入错误");
+//			request.getRequestDispatcher("error.jsp")
+//					.forward(request, response);
+//		}
+//		else{
+			int ret = accountDAO.checkAccount(accountForm);
 			if (ret == 1) {
 				String accountType = accountDAO.getAccountType(accountForm);
 	            HttpSession session=request.getSession();
-	            session.setAttribute("Account",accountForm.getName());
+	            session.setAttribute("name",accountForm.getName());
+	            session.setAttribute("id", accountForm.getId());
 	            session.setAttribute("AccountType", accountType);
-	            if (accountType.equals("Student")) {
-	            	response.sendRedirect("Student/index.jsp");
-	            }
-	            else if (accountType.equals("Acdemic Dean")) {
-	            	response.sendRedirect("AcdemicDean/index.jsp");
-	            }
-	            else if (accountType.equals("Administrator")) {
-	            	response.sendRedirect("Admin/index.jsp");
-	            }
+//	            accountDAO.postStatus(accountForm.getId(), "hello neo4j");
+	            response.sendRedirect("home.jsp");
 			} else {
-				request.setAttribute("error", "��������˻�����������");
+				request.setAttribute("error", "用户名或密码输入错误");
 				request.getRequestDispatcher("error.jsp")
-						.forward(request, response);//ת��������ʾҳ
+						.forward(request, response);
 			}
-		}
+//		}
 	}
 
 	// ��ѯ����Ա��Ϣ

@@ -1,91 +1,95 @@
 package com.dao;
 
 import com.core.*;
+
 import java.util.*;
+
 import com.actionForm.AccountForm;
+
 import java.sql.*;
 import java.*;
 
+import org.neo4j.graphdb.Transaction;
+
 public class AccountDAO {
     private ConnDB conn = new ConnDB();
-   /* public Collection query(String queryif) {
-        AccountForm AccountForm = null;
-      Collection Accountcoll = new ArrayList();
-        String sql = "";
-        if (queryif == null || queryif == "" || queryif == "all") {	//������queryif��ֵΪnull��all���ʱ��ѯȫ�����
-            sql = "select m.*,p.sysset,p.readerset,p.bookset,p.borrowback,p.sysquery from tb_Account m left join tb_purview p on m.id=p.id";
-            }else{
-                sql="select m.*,p.sysset,p.readerset,p.bookset,p.borrowback,p.sysquery from tb_Account m left join tb_purview p on m.id=p.id where m.name='"+queryif+"'";			//�˴���ҪӦ��������
-        }
-        ResultSet rs = conn.executeQuery(sql);					//ִ��SQL���
-        try {											//��׽�쳣��Ϣ
-            while (rs.next()) {
-                AccountForm = new AccountForm();
-                AccountForm.setId(Integer.valueOf(rs.getString(1)));
-                AccountForm.setName(rs.getString(2));
-                AccountForm.setPwd(rs.getString(3));
-                AccountForm.setSysset(rs.getInt(4));
-                AccountForm.setReaderset(rs.getInt(5));
-                AccountForm.setBookset(rs.getInt(6));
-                AccountForm.setBorrowback(rs.getInt(7));
-                AccountForm.setSysquery(rs.getInt(8));
-                Accountcoll.add(AccountForm);			//����ѯ���浽Collection������
-            }
-        } catch (SQLException e) {}
-        return Accountcoll;								//���ز�ѯ���
-    }*/
 
-    /*********************************************************/
-    //��ѯȨ����Ϣ
-   /* public AccountForm query_p(String str) {
-        AccountForm AccountForm1 = null;
-        String sql = "select m.*,p.sysset,p.readerset,p.bookset,p.borrowback,p.sysquery from tb_Account m left join tb_purview p on m.id=p.id where m.name='"+str+"'";
-
-        ResultSet rs = conn.executeQuery(sql);
-        try {
-            while (rs.next()) {
-                AccountForm1 = new AccountForm();
-                AccountForm1.setId(Integer.valueOf(rs.getString(1)));
-                AccountForm1.setName(rs.getString(2));
-                AccountForm1.setPwd(rs.getString(3));
-                AccountForm1.setSysset(rs.getInt(4));
-                AccountForm1.setReaderset(rs.getInt(5));
-                AccountForm1.setBookset(rs.getInt(6));
-                AccountForm1.setBorrowback(rs.getInt(7));
-                AccountForm1.setSysquery(rs.getInt(8));
-            }
-        } catch (SQLException ex) {
-        	ex.printStackTrace();
-        }finally{
-        	conn.close();
-        }
-        return AccountForm1;
-    }*/
+   
 
 
     public int checkAccount(AccountForm accountForm) {
-        int flag = 0;
+//    	ConnNeo4j.createDb();
+    	ConnNeo4j.loadPersonNodes();
         ChStr chStr=new ChStr();
-        String sql = "SELECT * FROM tb_account where aname='" +
-        chStr.filterStr(accountForm.getName()) + "'";
-        ResultSet rs = conn.executeQuery(sql);
-        try {
-            if (rs.next()) {
-                String pwd = chStr.filterStr(accountForm.getPwd());		//��ȡ��������벢���������ַ��е�Σ���ַ�
-                if (pwd.equals(rs.getString(3))) {
-                    flag = 1;
-                } else {
-                    flag = 0;
-                }
-            }else{
-                flag = 0;
-            }
-        } catch (SQLException ex) {
-            flag = 0;
-        }finally{
-        	conn.close();
+        String id = chStr.filterStr(accountForm.getId());
+        String pwd = chStr.filterStr(accountForm.getPwd());
+        System.out.println("User:"+id+",passwd:"+pwd);
+        try ( Transaction tx = ConnNeo4j.getGraphDb().beginTx() )
+        {
+        	System.out.println("length:" + ConnNeo4j.getPersonMap().size());
+	        if (ConnNeo4j.getPersonMap().containsKey(id)) {
+				// START SNIPPET: transaction
+	
+		        	Person person = ConnNeo4j.getPersonMap().get(id);
+		        	String pid = person.getUnderlyingNode().getProperty("id").toString();
+		        	String ppwd = person.getUnderlyingNode().getProperty("passwd").toString();
+		        	System.out.println("Userp:"+pid+",ppasswd:"+ppwd);
+		        	if (!id.equals(pid) || !pwd.equals(ppwd))
+		        		return 0;
+		        	else 
+		        		return 1;
+	        }
+	        else {
+	        	System.out.println("Not found user");
+	        }
+	        tx.success();
         }
-        return flag;
+        return 0;   
+    }
+    
+    public AccountForm getAccountForm(String userId) {
+//    	System.out.println("start get account form");
+    	AccountForm account = new AccountForm();
+    	try ( Transaction tx = ConnNeo4j.getGraphDb().beginTx() )
+        {
+        	Person person = ConnNeo4j.getPersonMap().get(userId);
+            account.initWithPersonNode(person);
+        	tx.success();
+        }
+    	return account;
+    }
+    
+    public void postStatus(String userId, String text, String picturePath) {
+        try ( Transaction tx = ConnNeo4j.getGraphDb().beginTx() )
+        {
+        	Person person = ConnNeo4j.getPersonMap().get(userId);
+        	person.addStatus(text, picturePath);
+        	tx.success();
+        }
+    }
+    
+    @SuppressWarnings("deprecation")
+	public Iterator<StatusUpdate> getPersonalStatuses(String userId) {
+    	try ( Transaction tx = ConnNeo4j.getGraphDb().beginTx() )
+        {
+//    		userId = "875"; //875
+        	Person person = ConnNeo4j.getPersonMap().get(userId);
+        	
+//        	person.addStatus("896 message 1","/upload/2.png");
+//        	person.addStatus("875 message 2","/upload/2.png");
+        	Iterator<StatusUpdate> statuses = person.friendStatuses();
+        	
+//        	System.out.println("start print status list");
+//        	for (StatusUpdate status: statuses) {
+//        		System.out.println("text:"+status.getStatusText()+","+status.getDate().toLocaleString());
+//        	}
+//        	while (statuses.hasNext()) {
+//        		StatusUpdate status = statuses.next();
+//        		System.out.println("text:"+status.getStatusText()+","+status.getDate().toLocaleString());
+//        	}
+        	tx.success();
+        	return statuses;
+        }
     }
     
     public String getAccountType(AccountForm accountForm){
@@ -108,33 +112,7 @@ public class AccountDAO {
         return accountType;
     }
 
-   /* //�޸�ʱӦ�õĲ�ѯ����
-    public AccountForm query_update(AccountForm AccountForm) {
-        AccountForm AccountForm1 = null;
-        String sql = "select m.*,p.sysset,p.readerset,p.bookset,p.borrowback,p.sysquery from tb_Account m left join tb_purview p on m.id=p.id where m.id=" +
-                     AccountForm.getId() + "";
-
-        ResultSet rs = conn.executeQuery(sql);	//ִ�в�ѯ���
-        try {
-            while (rs.next()) {
-                AccountForm1 = new AccountForm();
-                AccountForm1.setId(Integer.valueOf(rs.getString(1)));
-                AccountForm1.setName(rs.getString(2));
-                AccountForm1.setPwd(rs.getString(3));
-                AccountForm1.setSysset(rs.getInt(4));
-                AccountForm1.setReaderset(rs.getInt(5));
-                AccountForm1.setBookset(rs.getInt(6));
-                AccountForm1.setBorrowback(rs.getInt(7));
-                AccountForm1.setSysquery(rs.getInt(8));
-            }
-        } catch (SQLException ex) {
-        	ex.printStackTrace();	//����쳣��Ϣ
-        }finally{
-        	conn.close();	//�ر���ݿ�����
-        }
-        return AccountForm1;
-    }*/
-    //��Ŀ���ʱӦ�õĲ�ѯ����
+ 
     public AccountForm query_pwd(AccountForm AccountForm) {
         AccountForm AccountForm1 = null;
         String sql = "SELECT * FROM tb_Account WHERE name='" +AccountForm.getName() + "'";
@@ -142,7 +120,7 @@ public class AccountDAO {
         try {
             while (rs.next()) {
                 AccountForm1 = new AccountForm();
-                AccountForm1.setId(Integer.valueOf(rs.getString(1)));
+                AccountForm1.setId(rs.getString(1));
                 AccountForm1.setName(rs.getString(2));
                 AccountForm1.setPwd(rs.getString(3));
             }

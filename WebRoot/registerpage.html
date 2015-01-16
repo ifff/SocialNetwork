@@ -1,0 +1,126 @@
+<%@ page contentType="text/html; charset=utf-8" language="java"%>
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>注册 同窗网——一起吃辣条好不好</title>
+<link href="styles/register.css" type="text/css" rel="stylesheet">
+<link href="styles/global.css" type="text/css" rel="stylesheet">
+<script src="script/sitedata_bas.js" language="javascript"></script>
+<script src="script/datecreate.js" language="javascript"></script>
+<script src="script/trim.js" language="javascript"></script>
+<script src="script/register.js" language="javascript"></script>
+</head>
+<body>
+<div id="container">
+  <!-- top部分DIV -->
+	<div id="top">
+    	<!-- top部分的LogoDIV -->
+    	<div id="topLogo">
+        	<!-- topLogo部分的icoDIV -->
+            <div id="topLogoIco"> <a href="index.html"><img src="images/weblogo.jpg" width="72" height="72" alt=""></a>
+        </div>
+            <!-- topLogo部分的icoDIV结束 -->   
+      </div>
+        <!-- top部分的LogoDIV结束 -->
+        
+        <!-- top部分的文字导航 -->
+        <div id="topWordMenu">
+        	<ul>
+            	<li>已有同窗网账号，<a href="loginpage.html">请登录</a></li>
+          </ul>
+        </div>
+        <!-- top部分的文字导航结束 -->
+    </div>
+    <!-- top部分结束 -->
+  <div id="banner">
+    <div id="bannerTop">
+      <div id="bannerWord1">加入同窗网</div>
+      <div id="bannerWord2">如果你已经是灵步网注册用户，请直接<a href="loginpage.html">登陆同窗网</a></div>
+    </div>
+    <div id="main">
+      <form action="CustomerIndex.html" method="post" onsubmit="return checkForm()">
+      <table width="765" border="0" cellpadding="0" cellspacing="0">
+        <tbody><tr>
+          <td width="71">&nbsp;</td>
+          <td width="86" align="center" valign="middle" class="wordleft">用 &nbsp;户&nbsp; 名</td>
+          <td width="189" align="center" valign="middle"><input name="userID" type="text" class="form" id="userID" onblur="checkUserId(img1,this)" onfocus="getfocus(this,img1)"></td>
+          <td width="419" align="left" valign="middle" class="wordright"><img name="img1" width="16" height="16" id="img1"><div class="registertip" id="userIDtip">请输入真实姓名，方便您的朋友与你联系</div></td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td align="center" valign="middle" class="wordleft">昵 &nbsp; &nbsp;&nbsp;&nbsp;称</td>
+          <td align="center" valign="middle"><input name="userName" type="text" class="form" id="userName" onfocus="getfocus(this,img2)" onblur="checkUserName(img2,this)" maxlength="20"></td>
+          <td align="left" valign="middle" class="wordright"><img name="img2" width="16" height="16" id="img2"><div class="registertip" id="userNametip">请输入4到20位数字、字符、中文，一旦注册，不得修改</div></td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td align="center" valign="middle" class="wordleft">电子邮箱</td>
+          <td align="center" valign="middle"><input name="userMail" type="text" class="form" id="userMail" onblur="checkUserMail(img4,this)" onfocus="getfocus(this,img4)"></td>
+          <td align="left" valign="middle" class="wordright"><img name="img4" width="16" height="16" id="img4"><div class="registertip" id="userMailtip">找回账户和密码用，如123@163.com</div></td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td align="center" valign="middle" class="wordleft">创建密码</td>
+          <td align="center" valign="middle"><input name="userPass" type="password" class="form" id="userPass" onfocus="getfocus(this,img5)" onblur="checkUserPass(img5,this)" maxlength="20"></td>
+          <td align="left" valign="middle" class="wordright"><img name="img5" width="16" height="16" id="img5"><div class="registertip" id="userPasstip">密码由6到20个字母、数字、特殊符号组成，字母区分大小写</div></td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td align="center" valign="middle" class="wordleft">密码确认</td>
+          <td align="center" valign="middle"><input name="userRpass" type="password" class="form" id="userRpass" onblur="checkUserRpass(img6,this)" onfocus="getfocus(this,img6)" maxlength="20"></td>
+          <td align="left" valign="middle" class="wordright"><img name="img6" width="16" height="16" id="img6"><div class="registertip" id="userRpasstip">请再次输入密码</div></td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td align="center" valign="middle" class="wordleft">所在城市</td>
+          <td colspan="2" valign="middle"><select name="region1" class="form1" id="region1">
+            <option value="北京">北京</option><option value="广东">广东</option><option value="上海">上海</option><option value="天津">天津</option><option value="重庆">重庆</option><option value="辽宁">辽宁</option><option value="江苏">江苏</option><option value="湖北">湖北</option><option value="四川">四川</option><option value="陕西">陕西</option><option value="河北">河北</option><option value="山西">山西</option><option value="河南">河南</option><option value="吉林">吉林</option><option value="黑龙江">黑龙江</option><option value="内蒙古">内蒙古</option><option value="山东">山东</option><option value="安徽">安徽</option><option value="浙江">浙江</option><option value="福建">福建</option><option value="湖南">湖南</option><option value="广西">广西</option><option value="江西">江西</option><option value="贵州">贵州</option><option value="云南">云南</option><option value="西藏">西藏</option><option value="海南">海南</option><option value="甘肃">甘肃</option><option value="宁夏">宁夏</option><option value="青海">青海</option><option value="新疆">新疆</option><option value="香港">香港</option><option value="澳门">澳门</option><option value="台湾">台湾</option><option value="海外">海外</option><option value="其他">其他</option></select>
+            <select name="region2" class="form4" id="region2">
+              <option value="东城区">东城区</option><option value="西城区">西城区</option><option value="崇文区">崇文区</option><option value="宣武区">宣武区</option><option value="朝阳区">朝阳区</option><option value="海淀区">海淀区</option><option value="丰台区">丰台区</option><option value="石景山区">石景山区</option><option value="房山区">房山区</option><option value="通州区">通州区</option><option value="顺义区">顺义区</option><option value="昌平区">昌平区</option><option value="大兴区">大兴区</option><option value="怀柔区">怀柔区</option><option value="平谷区">平谷区</option><option value="门头沟区">门头沟区</option><option value="密云县">密云县</option><option value="延庆县">延庆县</option><option value="其他">其他</option></select>
+            <select name="region3" class="form4" id="region3" style="display: none;">
+            </select>            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+          </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td align="center" valign="middle" class="wordleft">出生年月</td>
+          <td align="left" valign="middle"><select name="year" class="form2" id="year">
+          <option value="1965">1965</option><option value="1966">1966</option><option value="1967">1967</option><option value="1968">1968</option><option value="1969">1969</option><option value="1970">1970</option><option value="1971">1971</option><option value="1972">1972</option><option value="1973">1973</option><option value="1974">1974</option><option value="1975">1975</option><option value="1976">1976</option><option value="1977">1977</option><option value="1978">1978</option><option value="1979">1979</option><option value="1980">1980</option><option value="1981">1981</option><option value="1982">1982</option><option value="1983">1983</option><option value="1984">1984</option><option value="1985">1985</option><option value="1986">1986</option><option value="1987">1987</option><option value="1988">1988</option><option value="1989">1989</option><option value="1990">1990</option><option value="1991">1991</option><option value="1992">1992</option><option value="1993">1993</option><option value="1994">1994</option><option value="1995">1995</option><option value="1996">1996</option><option value="1997">1997</option><option value="1998">1998</option><option value="1999">1999</option><option value="2000">2000</option><option value="2001">2001</option><option value="2002">2002</option><option value="2003">2003</option><option value="2004">2004</option><option value="2005">2005</option><option value="2006">2006</option><option value="2007">2007</option><option value="2008">2008</option><option value="2009">2009</option><option value="2010">2010</option><option value="2011">2011</option></select>   <select name="month" class="form3" id="month">
+          <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select>
+          <select name="date" class="form3" id="date">
+          <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="29">29</option><option value="30">30</option><option value="31">31</option></select></td>
+          <td align="left" valign="middle" class="wordright">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div class="registertip">请选择你的出身年月日</div></td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td align="center" valign="middle" class="wordleft">验 &nbsp;证 &nbsp;码</td>
+          <td align="center" valign="middle"><input name="verify" type="text" class="form" id="verify" onblur="checkVertyCode(img7,this)" onfocus="getfocus(this,img7)" maxlength="4"></td>
+          <td align="left" valign="middle" class="verifyword"> <span class="wordright">
+          <div id="yanzhengma1"><img alt="" name="img7" width="16" height="16" align="absmiddle" id="img7"></div></span>
+          <div id="yanzhengma">5605</div>
+          看不清？<a href="javascript:createCode()">换一换</a></td>
+        </tr>
+        <tr>
+          <td height="35" colspan="4" align="center">
+            <input name="checkbox" type="checkbox" id="checkbox" onclick="deal(this,button)">
+            我已经看过
+          ，并同意<a href="#">《同窗网使用协议》</a></td>
+          </tr>
+        <tr>
+          <td colspan="4" align="center" valign="middle"><input type="submit" disabled="disabled" name="button" id="button" value="立即注册" class="button"></td>
+          </tr>
+      </tbody></table>
+    </form>
+    </div>
+    <!-- footer部分 -->
+    <div id="footer">
+    	<!-- footer网站链接部分 -->
+        <div id="footerCopy">
+        	欢迎加入同窗网
+        </div>
+        <!-- footer网站版权信息结束 -->
+    </div>
+    <!-- footer部分结束 -->
+</div>
+</div>
+
+
+</body></html>

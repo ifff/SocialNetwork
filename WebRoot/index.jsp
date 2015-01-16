@@ -1,93 +1,83 @@
-<%@ page contentType="text/html; charset=utf-8" language="java"
-	import="java.sql.*" errorPage=""%>
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-
-<style type="text/css">
-body {
-	background-image: url(Images/background.jpg);
-	background-repeat: no-repeat;
-}
-
-#apDiv1 {
-	position: absolute;
-	width: 322px;
-	height: 108px;
-	layer-background-color: #F06;
-	border: 1px none #000000;
-	z-index: 1;
-	left: 547px;
-	top: 337px;
-}
-
-ys01 {
-	font-weight: bold;
-}
-
-ys01 {
-	font-weight: bold;
-}
-</style>
-
-<title>研究生教务系统</title>
+﻿<!DOCTYPE html>
+<html style="height:100%"><head>
+	<title>同窗网登陆界面</title>
+	<meta name="keywords" content="">
+	<meta name="description" content="">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<link href="css/font-awesome.min.css" rel="stylesheet" type="text/css">
+	<link href="css/bootstrap.min.css" rel="stylesheet" type="text/css">
+	<link href="css/bootstrap-theme.min.css" rel="stylesheet" type="text/css">
+	<link href="css/bootstrap-social.css" rel="stylesheet" type="text/css">	
+	<link href="css/templatemo_style.css" rel="stylesheet" type="text/css">	
+</head>
 <script language="javascript">
 	function check(form){
 		if (form.name.value==""){
-			alert("请输入账号！");
+			alert("用户名不能为空");
 			form.name.focus();
 			return false;
 		}
 		if (form.pwd.value==""){
-			alert("请输入密码！");
+			alert("密码不能为空");
 			form.pwd.focus();
 			return false;
 		}
-		if (form.rand.value == ""){
-			alert("请输入验证码！");
-			form.rand.focus();
-			return false;
-		}
 	}
-	
-	function refresh() {
-		var img = document.getElementById("checkImg");  
-  		img.src=img.src+"?"; 
-	} 
 </script>
-</head>
-
-<body>
-	<form id="form1" name="form1" method="post"
-		action="account?action=login">
-		<div id="apDiv1">
-			<table width="100%" border="0" cellspacing="10" cellpadding="0">
-				<tr>
-					<td width="29%" align="center" valign="middle" scope="col">用户名</td>
-					<th width="71%" align="left" scope="col"><input type="text"
-						name="name" id="name" /></th>
-				</tr>
-				<tr>
-					<td align="center" valign="middle">密码</td>
-					<td align="left"><input type="password" name="pwd" id="pwd" /></td>
-				</tr>
-				<tr>
-					<td align="center" valign="middle">验证码</td>
-					<td align="left"><input type="text" name="rand" maxlength="4"
-						value="" size="6" /> <img border="1" id="checkImg" src="image.jsp"
-						onclick="refresh();" alt="3" /> <a href="#"
-						onclick="javascript:refresh();" />换一张</a></td>
-				</tr>
-				<tr>
-					<td colspan="2" align="center"><input type="submit"
-						name="login" id="login" value="登陆" onclick="return check(form1)" />
-						&nbsp; <input type=reset value="重置" /></td>
-				</tr>
-			</table>
+<body background="images/background.jpg" style="background-size:cover;height:100%;">
+	<div class="container">
+		<div class="col-md-12">			
+			<form id = "form1" class="form-horizontal templatemo-login-form-2" role="form" action="account?action=login" method="post">
+				<div class="row">
+					<div class="col-md-12">
+						<h1>同窗网    --找一起吃辣条的同学</h1>
+					</div>
+				</div>
+				<div class="row">
+					<div class="templatemo-one-signin col-md-6">
+				        <div class="form-group">
+				          <div class="col-md-12">		          	
+				            <label for="username" class="control-label">用户名</label>
+				            <div class="templatemo-input-icon-container">
+				            	<i class="fa fa-user"></i>
+				            	<input type="text" class="form-control" id="name" name="name" placeholder="">
+				            </div>		            		            		            
+				          </div>              
+				        </div>
+				        <div class="form-group">
+				          <div class="col-md-12">
+				            <label for="password" class="control-label">密码</label>
+				            <div class="templatemo-input-icon-container">
+				            	<i class="fa fa-lock"></i>
+				            	<input type="password" class="form-control" id="pwd" name="pwd" placeholder="">
+				            </div>
+				          </div>
+				        </div>
+				        <div class="form-group">
+				          <div class="col-md-12">
+				            <div class="checkbox">
+				                <label>
+				                  <input type="checkbox">下次直接登陆</label>
+				            </div>
+				          </div>
+				        </div>
+				        <div class="form-group">
+				          <div class="col-md-12">
+				            <input type="submit" value="登陆" class="btn btn-warning" onclick="return check(form1)">
+				          </div>
+				        </div>
+				        <div class="form-group">
+				          	<div class="col-md-12">
+				        		<a href="forgot-password.html" class="text-center">忘记密码？</a>
+				       	 	</div>
+				    	</div>
+					</div>
+					   
+				</div>				 	
+		      </form>		      		      
 		</div>
-	</form>
-</body>
-</html>
+	</div>
+
+</body></html>
