@@ -1,4 +1,4 @@
-<%@ page contentType="text/html; charset=utf-8" language="java"%>
+﻿<%@ page contentType="text/html; charset=gbk" language="java"%>
 <html xmlns="http://www.w3.org/1999/xhtml"><head>
 <%@ page import="java.util.*"%>
 <%@ page import="java.io.*"%>
@@ -25,7 +25,7 @@ window.onload = function(){
 	if (id == null || "".equals(id)){
 		response.sendRedirect("index.jsp");
 	} 
-	String qid = request.getParameter("id");
+	String qid = id;
 	AccountDAO accountDAO = new AccountDAO();
 	AccountForm account = accountDAO.getAccountForm(qid);
 	Collection<String> friendList = accountDAO.getFriendList(qid);
@@ -77,12 +77,94 @@ window.onload = function(){
             </div>
             <!-- 左侧mainBannerTopDIV 结束 -->
             <!-- 左侧mainBannerMenuDIV 开始 -->
+            <!-- banner部分DIV -->
             <div id="mainBannerMenu">
                 <!-- 左侧mainBannerMenuTopDIV 开始 -->
                 <div id="mainBannerMenuTop">
                     <!-- 左侧mainBannerMenuTopWord1DIV 开始 -->
-                    <div id="mainBannerMenuTopWord1"><b>新鲜事</b>
-                    </div>
+                    <div id="mainBannerMenuTopWord1"><b>设置</b>
+                    </div></div></div>
+    <div id="banner">
+        <!-- banner部分的leftDIV -->
+        <div class="left" id="left">
+        <form id="form1" action="account?action=updateProfile"
+		method="post">
+            <table width="564" border="0" cellpadding="0" cellspacing="0" class="left">
+                <!-- 昵称 -->
+                <tbody><tr>
+                    <td width="120" height="50" align="right"><strong>你的昵称</strong></td>
+                    <td width="20" height="60">&nbsp;</td>
+                    <td width="425" height="60"><label>
+                         <input name="name" type="text" class="n1" id="name" value=<%=account.getName() %>>
+<br>
+                              您的昵称将显示在您的主页中</label></td>
+                </tr>
+                
+                
+                <!-- 生日 -->
+                <tr>
+                    <td width="120" height="49" align="right"><strong>生日</strong></td>
+                    <td width="20" height="49">&nbsp;</td>
+                    <td width="425" height="49"><label>
+                         <input name="birthday" type="text" class="n3" id="birthday" value=<%=account.getBirthday() %>>
+                             </label></td>
+                </tr>
+                <!-- 地址 -->
+                <tr>
+                    <td width="120" height="52" align="right"><strong>地址</strong></td>
+                    <td width="20" height="52">&nbsp;</td>
+                    <td width="425" height="52">
+                    <label>
+                      <input name="hometown" type="text" class="n3" id="hometown" value=<%=account.getHometown() %>>
+                    </label>
+            <label>
+              <br>
+              你在哪？让你周围的更多的朋友找到你</label></td>
+                </tr>
+                <!-- 喜欢运动 -->
+                <tr>
+                    <td width="120" height="68" align="right"><strong>喜欢运动</strong></td>
+                    <td width="20" height="68">&nbsp;</td>
+                    <td width="425" height="68"><label>
+                        <input name="activity" type="text" class="n1" id="activity" value=<%=account.getFavoriteActivity() %>>
+                        <br>
+                         说出你喜欢运动</label></td>
+                </tr>
+                <!-- 个性签名 -->
+                <tr>
+                    <td width="120" height="180" align="right"><strong>喜欢的食物</strong></td>
+                    <td width="20" height="180">&nbsp;</td>
+                    <td width="425" height="180">
+                       <div>
+                            <label>
+                                  <input name="food" type="text" class="n1" id="food" value=<%=account.getFavoriteFood() %>>
+                            </label>
+                       </div></td>
+                </tr>
+                <!-- 保存按钮 -->
+                <tr>
+                    <td width="120" height="20" align="right">&nbsp;</td>
+                    <td width="20" height="44">&nbsp;</td>
+                    <td width="425" height="44"><label>
+                         <input name="button" type="submit" class="btn" id="button" value="保存">
+                            </label></td>
+                </tr>
+            </tbody></table></form>
+        </div>
+        <!-- banner_left部分DIV结束 -->
+        <!-- banner_right部分DIV -->
+        <div class="right" id="right">
+           <p>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp在这里
+              ，你可以设置你账号的基本信息，隐私信息等</p>
+        </div>
+        <!-- banner_right部分DIV结束 -->
+    </div>
+    <!-- banner部分DIV结束 -->
+<%--             <div id="mainBannerMenu">
+                <!-- 左侧mainBannerMenuTopDIV 开始 -->
+                <div id="mainBannerMenuTop">
+                    <!-- 左侧mainBannerMenuTopWord1DIV 开始 -->
+                   
                     <!-- 左侧mainBannerMenuTopWord1DIV 结束-->
                     <!-- 左侧mainBannerMenuTopWord2DIV 开始 -->
                     <%
@@ -93,7 +175,7 @@ window.onload = function(){
                     <!-- 左侧mainBannerMenuTopWord2DIV 结束 -->
                 </div>
             	<!-- 左侧mainBannerMenuTopDIV 结束-->
-            </div>
+            </div> --%>
             <!-- 左侧mainBannerMenu DIV 结束-->
             <!--自己发微博的地方-->
             <div id="mainBannerContent"> 
@@ -104,27 +186,6 @@ window.onload = function(){
                      <!--个人微博-->
  
                        <!-- 第一个人微博 mainBannerContent2PeopleImg DIV 开始 -->
-                       <%
-
-                       		while (it.hasNext()) {
-                       			StatusForm status = (StatusForm)it.next();
-                       			out.println("<div id='mainBannerContent2People'>\n");
-    		             		out.println("<div id='mainBannerContent2PeopleImg'>\n");
-    		             		out.println("<img src='images/head1.jpg' width='54' height='54' alt='' title=''>\n");		             		
-    		             		out.println("</div>");
-    		             		out.println("<div id='mainBannerContent2PeopleWord'>");
-    		             		//
-    		             		ChStr chStr=new ChStr();
-//				        String id = chStr.filterStr(accountForm.getId());
-    		             		out.println("<font class='f1'><a href='' class='a1'>"+account.getName()+"                         "+"&nbsp&nbsp&nbsp</a></font><font class='f2'>"+chStr.filterStr(status.getText())+" </font><br>");
-    		             		out.println("<img src="+status.getPicturePath()+" width='166' height='166' alt='' title='' align='absmiddle'>");
-    		             		out.println("<br><font class='f3'>"+status.getDate()+"<div id='textright'></div></font><br>  ");
-    		             		//
-    		             		out.println("</div><br>");
-    		             		out.println("</div>");
-                       		}
-
-                     %>
 
                   </div>  
                   <!--给微博定位结束-->

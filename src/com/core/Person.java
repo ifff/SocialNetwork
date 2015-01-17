@@ -48,7 +48,7 @@ public class Person
     // START SNIPPET: the-node
     private final Node underlyingNode;
 
-    Person( Node personNode )
+    public Person( Node personNode )
     {
         this.underlyingNode = personNode;
     }
@@ -299,7 +299,7 @@ public class Person
         return null;
     }
 
-    private Iterable<Person> getFriendsByDepth( int depth )
+    public Iterable<Person> getFriendsByDepth( int depth )
     {
         // return all my friends and their friends using new traversal API
         TraversalDescription travDesc = graphDb().traversalDescription()

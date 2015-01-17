@@ -22,14 +22,15 @@ public class ConnNeo4j {
     {
     	clearDb();
     	graphDb = new GraphDatabaseFactory().newEmbeddedDatabase( DB_PATH );
-    	//registerShutdownHook( graphDb );
+    	registerShutdownHook( graphDb );
     	loadGraphFile();
     }
 	
 	public static GraphDatabaseService getGraphDb() {
 		if (graphDb == null) {
+//			createDb();
 			graphDb = new GraphDatabaseFactory().newEmbeddedDatabase( DB_PATH );
-			//registerShutdownHook( graphDb );
+			registerShutdownHook( graphDb );
 		}
 		return graphDb;
 	}
@@ -166,10 +167,160 @@ public class ConnNeo4j {
     }
 	public static void main( final String[] args )
     {
-    
-//        ConnNeo4j.createDb();
-        ConnNeo4j.loadPersonNodes();
-        
+		//ConnNeo4j.createDb();
+		int command = 0;
+		char continueFlag = 'y';
+		while (continueFlag == 'y') {
+			System.out.println("########## Scoial Network Graph Search Console ##########");
+			System.out.println("[0] exit");
+			System.out.println("[1] search a user's friends with depth");
+			System.out.println("[2] get a user's status list");
+			System.out.println("[3] get the status list of the user's friends");
+			System.out.println("[4]  Add friend relationship between two person");
+			System.out.println("[5]  Remove friend relationship between two person");
+			System.out.println("[6] get relationship between two person (show total path count and closest path)");
+			System.out.println("[7] recommendation friends for a specific person");
+			Scanner scan = new Scanner(System.in);
+			command = scan.nextInt();
+			if (command == 0) {
+				break;
+			}
+			else if (command == 1) {
+				int tag = 1;
+				while (tag != 0){
+					System.out.println("######## search a user's friends with depth #####");
+					System.out.println("Please input the userId and depth:");
+					int userId = scan.nextInt();
+					int depth = scan.nextInt();
+			    	try ( Transaction tx = ConnNeo4j.getGraphDb().beginTx() )
+			        {
+						Person user = ConnNeo4j.getPersonMap().get(String.valueOf(userId));
+						Iterable<Person> friends = user.getFriendsByDepth(depth);
+						int friendCount = 1;
+						System.out.println("The friend list of user "+user.getName() + "(" + userId + ") is followed...");
+						for (Person friend: friends) {
+							System.out.println("["+friendCount+"]"+friend.getName()+"("+friend.getUnderlyingNode().getProperty("id")+")");
+							friendCount += 1;
+						}
+						tx.success();
+			        }
+					System.out.println("######## search a user's friends with depth #####");
+					System.out.println("[0] back to main menu");
+					System.out.println("[1] continue search friends");
+					tag = scan.nextInt();
+				}
+			}
+			else if (command == 4) {
+				int tag = 1;
+				while (tag != 0){
+					System.out.println("####### Add friend relationship between two person ######");
+					System.out.println("Please input the ids of the two person:");
+					int userId1 = scan.nextInt();
+					int userId2 = scan.nextInt();
+			    	try ( Transaction tx = ConnNeo4j.getGraphDb().beginTx() )
+			        {
+						Person user1 = ConnNeo4j.getPersonMap().get(String.valueOf(userId1));
+						Person user2 = ConnNeo4j.getPersonMap().get(String.valueOf(userId2));
+						user1.addFriend(user2);
+						Iterable<Person> friends = user1.getFriends();
+						int friendCount = 1;
+						System.out.println("The friend list of user "+user1.getName() + "(" + userId1 + ") is followed...");
+						for (Person friend: friends) {
+							System.out.println("["+friendCount+"]"+friend.getName()+"("+friend.getUnderlyingNode().getProperty("id")+")");
+							friendCount += 1;
+						}
+						tx.success();
+			        }
+			    	System.out.println("######  Add friend relationship between two person ######");
+					System.out.println("[0] back to main menu");
+					System.out.println("[1] continue add friend relationship");
+					tag = scan.nextInt();
+				}
+			}
+			else if (command == 5) {
+				int tag = 1;
+				while (tag != 0){
+					System.out.println("####### Remove friend relationship between two person ######");
+					System.out.println("Please input the ids of the two person:");
+					int userId1 = scan.nextInt();
+					int userId2 = scan.nextInt();
+			    	try ( Transaction tx = ConnNeo4j.getGraphDb().beginTx() )
+			        {
+						Person user1 = ConnNeo4j.getPersonMap().get(String.valueOf(userId1));
+						Person user2 = ConnNeo4j.getPersonMap().get(String.valueOf(userId2));
+						user1.removeFriend(user2);;
+						Iterable<Person> friends = user1.getFriends();
+						int friendCount = 1;
+						System.out.println("The friend list of user "+user1.getName() + "(" + userId1 + ") is followed...");
+						for (Person friend: friends) {
+							System.out.println("["+friendCount+"]"+friend.getName()+"("+friend.getUnderlyingNode().getProperty("id")+")");
+							friendCount += 1;
+						}
+						tx.success();
+			        }
+			    	System.out.println("######  Remove friend relationship between two person ######");
+					System.out.println("[0] back to main menu");
+					System.out.println("[1] continue remove friend relationship");
+					tag = scan.nextInt();
+				}
+			}
+			else if (command == 6) {
+				int tag = 1;
+				while (tag != 0){
+					System.out.println("####### get closest relationship between two person ######");
+					System.out.println("Please input the ids of the two person:");
+					int userId1 = scan.nextInt();
+					int userId2 = scan.nextInt();
+			    	try ( Transaction tx = ConnNeo4j.getGraphDb().beginTx() )
+			        {
+						Person user1 = ConnNeo4j.getPersonMap().get(String.valueOf(userId1));
+						Person user2 = ConnNeo4j.getPersonMap().get(String.valueOf(userId2));
+						Iterable<Person> path = user1.getShortestPathTo(user2, 6);
+						System.out.println("The path between "+user1.getName() + "(" + user1.getUnderlyingNode().getProperty("id") + ") "+user2.getName()+"("+String.valueOf(userId2)+" )is followed...");
+						String totalPath = "";
+						for (Person friend: path) {
+							if (friend.getUnderlyingNode().getProperty("id").equals(String.valueOf(userId2))) {
+								totalPath += friend.getName()+"("+friend.getUnderlyingNode().getProperty("id")+")";
+							}
+							else {
+								totalPath += friend.getName()+"("+friend.getUnderlyingNode().getProperty("id")+") ==> ";
+							}
+						}
+						System.out.println(totalPath);
+						tx.success();
+			        }
+			    	System.out.println("###### get closest relationship between two person ######");
+					System.out.println("[0] back to main menu");
+					System.out.println("[1] continue search friends");
+					tag = scan.nextInt();
+				}
+			}
+			else if (command == 7) {
+				int tag = 1;
+				while (tag != 0){
+					System.out.println("######## recommendation friends for a specific person #####");
+					System.out.println("Please input the userId and recommendation count:");
+					int userId = scan.nextInt();
+					int count = scan.nextInt();
+			    	try ( Transaction tx = ConnNeo4j.getGraphDb().beginTx() )
+			        {
+						Person user = ConnNeo4j.getPersonMap().get(String.valueOf(userId));
+						Iterable<Person> friends = user.getFriendRecommendation(count);
+						int friendCount = 1;
+						System.out.println("The recommendation friend list of user "+user.getName() + "(" + userId + ") is followed...");
+						for (Person friend: friends) {
+							System.out.println("["+friendCount+"]"+friend.getName()+"("+friend.getUnderlyingNode().getProperty("id")+")");
+							friendCount += 1;
+						}
+						tx.success();
+			        }
+					System.out.println("######## recommendation friends for a specific person #####");
+					System.out.println("[0] back to main menu");
+					System.out.println("[1] continue recommendation friends");
+					tag = scan.nextInt();
+				}
+			}
+		}
     }
 	
 	void shutDown()

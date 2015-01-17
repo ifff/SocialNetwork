@@ -25,13 +25,15 @@ window.onload = function(){
 	if (id == null || "".equals(id)){
 		response.sendRedirect("index.jsp");
 	} 
-	String qid = request.getParameter("id");
+	String qid = request.getParameter("userid");
 	AccountDAO accountDAO = new AccountDAO();
 	AccountForm account = accountDAO.getAccountForm(qid);
 	Collection<String> friendList = accountDAO.getFriendList(qid);
 	Collection<StatusForm> statuses = accountDAO.getPersonalStatuses(qid);
 	Iterator<StatusForm> it = statuses.iterator();
 	int statusCount = statuses.size();
+
+	Iterator<String> friendIt = friendList.iterator();
 /* 	System.out.println(form.getFavoriteActivity()); */
 %>
 <body>
@@ -81,7 +83,7 @@ window.onload = function(){
                 <!-- 左侧mainBannerMenuTopDIV 开始 -->
                 <div id="mainBannerMenuTop">
                     <!-- 左侧mainBannerMenuTopWord1DIV 开始 -->
-                    <div id="mainBannerMenuTopWord1"><b>新鲜事</b>
+                    <div id="mainBannerMenuTopWord1"><b>好友</b>
                     </div>
                     <!-- 左侧mainBannerMenuTopWord1DIV 结束-->
                     <!-- 左侧mainBannerMenuTopWord2DIV 开始 -->
@@ -106,19 +108,23 @@ window.onload = function(){
                        <!-- 第一个人微博 mainBannerContent2PeopleImg DIV 开始 -->
                        <%
 
-                       		while (it.hasNext()) {
-                       			StatusForm status = (StatusForm)it.next();
+                       		while (friendIt.hasNext()) {
+                       			String friend = (String)friendIt.next();
+								Random r = new Random();
+    		             		int a = r.nextInt(6) + 1;
+								String friendInfo[] = friend.split("\t");
                        			out.println("<div id='mainBannerContent2People'>\n");
     		             		out.println("<div id='mainBannerContent2PeopleImg'>\n");
-    		             		out.println("<img src='images/head1.jpg' width='54' height='54' alt='' title=''>\n");		             		
+    		             		out.println("<img src='images/head"+String.valueOf(a)+".jpg' width='54' height='54' alt='' title=''>\n");		             		
     		             		out.println("</div>");
     		             		out.println("<div id='mainBannerContent2PeopleWord'>");
     		             		//
     		             		ChStr chStr=new ChStr();
 //				        String id = chStr.filterStr(accountForm.getId());
-    		             		out.println("<font class='f1'><a href='' class='a1'>"+account.getName()+"                         "+"&nbsp&nbsp&nbsp</a></font><font class='f2'>"+chStr.filterStr(status.getText())+" </font><br>");
-    		             		out.println("<img src="+status.getPicturePath()+" width='166' height='166' alt='' title='' align='absmiddle'>");
-    		             		out.println("<br><font class='f3'>"+status.getDate()+"<div id='textright'></div></font><br>  ");
+    		             		out.println("<font class='f1'><a href='home.jsp?id="+friendInfo[0]+"' class='a1'>"+chStr.filterStr(friendInfo[1])+"&nbsp&nbsp&nbsp</a></font><font class='f2'>"+friendInfo[4]+" </font><br>");
+    		             		out.println("<font class='f2'>"+friendInfo[2]+" </font><br>");
+								out.println("<font class='f2'>"+friendInfo[3]+" </font><br>");
+    		             		out.println("<br><font class='f3'>"+friendInfo[5]+"<div id='textright'></div></font><br>  ");
     		             		//
     		             		out.println("</div><br>");
     		             		out.println("</div>");
@@ -146,7 +152,7 @@ window.onload = function(){
                     <!-- 右侧mainRightPostionFirstLineIcon DIV 结束 -->
                     <!-- 右侧mainRightPostionFirstLineWord1 DIV 开始 -->
                     <div id="mainRightPostionFirstLineWord1">                 
-                    &nbsp;<font color="#005DC3"><b><a href=<% out.println("home.jsp?id="+qid); %> class="a1"><% out.println(account.getName()); %></a></b></font><br>
+                    &nbsp;<font color="#005DC3"><b><a href=<% out.println("home.jsp?id="+id);%> class="a1"><% out.println(account.getName()); %></a></b></font><br>
                     <% out.println(account.getHometown()); %>
                     </div>
                     <!-- 右侧mainRightPostionFirstLineWord1 DIV 结束 -->

@@ -5,6 +5,7 @@ import com.core.*;
 import java.util.*;
 
 import com.actionForm.AccountForm;
+import com.actionForm.StatusForm;
 
 import java.sql.*;
 import java.*;
@@ -12,10 +13,6 @@ import java.*;
 import org.neo4j.graphdb.Transaction;
 
 public class AccountDAO {
-    private ConnDB conn = new ConnDB();
-
-   
-
 
     public int checkAccount(AccountForm accountForm) {
 //    	ConnNeo4j.createDb();
@@ -68,140 +65,77 @@ public class AccountDAO {
         }
     }
     
+    public Collection<String> getFriendList(String userId) {
+    	Collection<String> friendList = new ArrayList<String>();
+    	try ( Transaction tx = ConnNeo4j.getGraphDb().beginTx() )
+        {
+    		Person person = ConnNeo4j.getPersonMap().get(userId);
+    		Iterable<Person> friends = person.getFriends();
+    		for (Person user: friends) {
+    			String friend = user.getUnderlyingNode().getProperty("id").toString()+"\t"+user.getName()+"\t"+user.getUnderlyingNode().getProperty("hometown").toString();
+    			friend = friend + "\t" + user.getUnderlyingNode().getProperty("favorite_activity").toString()+"\t"+user.getUnderlyingNode().getProperty("gender").toString();
+    			friend = friend + "\t" + user.getUnderlyingNode().getProperty("joined").toString();
+    			friendList.add(friend);
+    		}
+    		tx.success();
+        }
+    	return friendList;
+    }
+    
+    public Collection<StatusForm> getFriendStatus(String userId) {
+    	Collection<StatusForm> statusList = new ArrayList<StatusForm>();
+    	try ( Transaction tx = ConnNeo4j.getGraphDb().beginTx() )
+        {
+    		Person person = ConnNeo4j.getPersonMap().get(userId);
+    		Iterator<StatusUpdate> statuses = person.friendStatuses();
+        	while (statuses.hasNext()) {
+        		StatusUpdate status = statuses.next();
+        		StatusForm form = new StatusForm();
+        		form.setText(status.getStatusText());
+        		form.setDate(status.getDate().toLocaleString());
+        		Person friend = status.getPerson();
+        		form.setUserId(friend.getUnderlyingNode().getProperty("id").toString());
+        		form.setUserName(friend.getUnderlyingNode().getProperty("name").toString());
+        		form.setPicturePath(status.getStatusPicturePath());
+        		statusList.add(form);
+        	}
+    		tx.success();
+        }
+    	return statusList;
+    }
+    
     @SuppressWarnings("deprecation")
-	public Iterator<StatusUpdate> getPersonalStatuses(String userId) {
+	public Collection<StatusForm> getPersonalStatuses(String userId) {
+    	Collection<StatusForm> statusList = new ArrayList<StatusForm>();
     	try ( Transaction tx = ConnNeo4j.getGraphDb().beginTx() )
         {
 //    		userId = "875"; //875
         	Person person = ConnNeo4j.getPersonMap().get(userId);
-        	
-//        	person.addStatus("896 message 1","/upload/2.png");
+//        	person.addStatus("Today is a very nice day","/upload/2.png");
+        	Iterable<StatusUpdate> statuses = person.getStatus();
+
 //        	person.addStatus("875 message 2","/upload/2.png");
-        	Iterator<StatusUpdate> statuses = person.friendStatuses();
+//        	statuses = person.friendStatuses();
         	
 //        	System.out.println("start print status list");
-//        	for (StatusUpdate status: statuses) {
-//        		System.out.println("text:"+status.getStatusText()+","+status.getDate().toLocaleString());
-//        	}
+        	for (StatusUpdate status: statuses) {
+        		System.out.println("text:"+status.getStatusText()+","+status.getDate().toLocaleString()+","+status.getStatusPicturePath());
+        		StatusForm form = new StatusForm();
+        		form.setText(status.getStatusText());
+        		form.setDate(status.getDate().toLocaleString());
+        		Person friend = status.getPerson();
+        		form.setUserId(friend.getUnderlyingNode().getProperty("id").toString());
+        		form.setUserName(friend.getUnderlyingNode().getProperty("name").toString());
+        		form.setPicturePath(status.getStatusPicturePath());
+        		statusList.add(form);
+        	}
 //        	while (statuses.hasNext()) {
 //        		StatusUpdate status = statuses.next();
 //        		System.out.println("text:"+status.getStatusText()+","+status.getDate().toLocaleString());
 //        	}
         	tx.success();
-        	return statuses;
         }
+    	return statusList;
     }
-    
-    public String getAccountType(AccountForm accountForm){
-    	String accountType = "";
-        ChStr chStr=new ChStr();
-        String sql = "SELECT * FROM tb_account where aname='" +
-        chStr.filterStr(accountForm.getName()) + "'";
-        ResultSet rs = conn.executeQuery(sql);
-        try {
-			if (rs.next()) {
-			    String pwd = chStr.filterStr(accountForm.getPwd());		//��ȡ��������벢���������ַ��е�Σ���ַ�
-			    if (pwd.equals(rs.getString(3))) {
-			        accountType = rs.getString(4);
-			    } 
-			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        return accountType;
-    }
-
- 
-    public AccountForm query_pwd(AccountForm AccountForm) {
-        AccountForm AccountForm1 = null;
-        String sql = "SELECT * FROM tb_Account WHERE name='" +AccountForm.getName() + "'";
-        ResultSet rs = conn.executeQuery(sql);
-        try {
-            while (rs.next()) {
-                AccountForm1 = new AccountForm();
-                AccountForm1.setId(rs.getString(1));
-                AccountForm1.setName(rs.getString(2));
-                AccountForm1.setPwd(rs.getString(3));
-            }
-        } catch (SQLException ex) {
-        	ex.printStackTrace();
-        }finally{
-        	conn.close();
-        }
-        return AccountForm1;
-    }
-    //������
-    public int insert(AccountForm AccountForm) {
-        String sql1="SELECT * FROM tb_Account WHERE name='"+AccountForm.getName()+"'";
-        ResultSet rs = conn.executeQuery(sql1);
-        String sql = "";
-        int falg = 0;
-            try {
-                if (rs.next()) {
-                    falg=2;
-                } else {
-                    sql = "INSERT INTO tb_Account (name,pwd) values('" +
-                                 AccountForm.getName() + "','" +
-                                 AccountForm.getPwd() +
-                                 "')";
-                    falg = conn.executeUpdate(sql);
-                    System.out.println("��ӹ���Ա��Ϣ��SQL��" + sql);
-                }
-            } catch (SQLException ex) {
-                falg=0;
-            }finally{
-            	conn.close();
-            }
-        return falg;
-    }
-
-    //���ù���ԱȨ��
-    /*public int update(AccountForm AccountForm) {
-        String sql1="SELECT * FROM tb_purview WHERE id="+AccountForm.getId()+"";
-        ResultSet rs=conn.executeQuery(sql1);	//��ѯҪ����Ȩ�޵Ĺ���Ա��Ȩ����Ϣ
-        String sql="";
-        int falg=0;
-        try {					//��׽�쳣��Ϣ
-            if (rs.next()) {	//���Ѿ�����Ȩ��ʱ��ִ�и������
-                sql = "Update tb_purview set sysset=" + AccountForm.getSysset() +
-                             ",readerset=" + AccountForm.getReaderset() + ",bookset="+AccountForm.getBookset()+",borrowback="+AccountForm.getBorrowback()+",sysquery="+AccountForm.getSysquery()+" where id=" +
-                     AccountForm.getId() + "";
-            }else{	//δ����Ȩ��ʱ��ִ�в������
-                sql="INSERT INTO tb_purview values("+AccountForm.getId()+","+AccountForm.getSysset()+","+AccountForm.getReaderset()+","+AccountForm.getBookset()+","+AccountForm.getBorrowback()+","+AccountForm.getSysquery()+")";
-            }
-            falg = conn.executeUpdate(sql);
-            System.out.println("�޸����ʱ��SQL��" + sql);
-        } catch (SQLException ex) {
-            falg=0;			//��ʾ���ù���ԱȨ��ʧ��
-        }finally{
-        	conn.close();	//�ر���ݿ�����
-        }
-        return falg;
-    }*/
-    //�޸Ĺ���Ա����
-public int updatePwd(AccountForm AccountForm){
-    String sql="UPDATE tb_Account SET pwd='"+AccountForm.getPwd()+"' where name='"+AccountForm.getName()+"'";
-    int ret=conn.executeUpdate(sql);
-    System.out.println("�޸Ĺ���Ա����ʱ��SQL��"+sql);
-    conn.close();
-    return ret;
-}
-
-//ɾ�����
-    public int delete(AccountForm AccountForm) {
-    	int flag=0;
-    	try{		//��׽�쳣��Ϣ
-        String sql = "DELETE FROM tb_Account where id=" + AccountForm.getId() +"";
-        flag = conn.executeUpdate(sql);	//ִ��ɾ�����Ա��Ϣ�����
-        if (flag !=0){
-            String sql1 = "DELETE FROM tb_purview where id=" + AccountForm.getId() +"";
-            conn.executeUpdate(sql1);	//ִ��ɾ��Ȩ����Ϣ�����
-        }}catch(Exception e){
-        	System.out.println("ɾ�����Ա��Ϣʱ����Ĵ���"+e.getMessage());	//���������Ϣ
-        }finally{
-        	conn.close();	//�ر���ݿ�����
-        }
-        return flag;
-    }
+   
 }

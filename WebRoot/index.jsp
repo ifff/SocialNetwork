@@ -70,7 +70,7 @@
 				        </div>
 				        <div class="form-group">
 				          	<div class="col-md-12">
-				        		<a href="forgot-password.html" class="text-center">忘记密码？</a>
+				        		<a href="register.jsp" class="text-center">注册新用户</a>
 				       	 	</div>
 				    	</div>
 					</div>

@@ -11,22 +11,21 @@ import javax.servlet.ServletResponse;
 
 public class CharacterEncodingFilter implements Filter {
 
-	protected String encoding = null;// ¶¨Òå±àÂë¸ñÊ½±äÁ¿
-	protected FilterConfig filterConfig = null;// ¶¨Òå¹ıÂËÆ÷ÅäÖÃ¶ÔÏó
+	protected String encoding = null;// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½
+	protected FilterConfig filterConfig = null;// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¶ï¿½ï¿½ï¿½
 
 	public void init(FilterConfig filterConfig) throws ServletException {
-		this.filterConfig = filterConfig; // ³õÊ¼»¯¹ıÂËÆ÷ÅäÖÃ¶ÔÏó
-		this.encoding = filterConfig.getInitParameter("encoding");// »ñÈ¡ÅäÖÃÎÄ¼şÖĞÖ¸¶¨µÄ±àÂë¸ñÊ½
+		this.filterConfig = filterConfig; // ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¶ï¿½ï¿½ï¿½
+		this.encoding = filterConfig.getInitParameter("encoding");// ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½Ä±ï¿½ï¿½ï¿½ï¿½Ê½
 	}
 
-	// ¹ıÂËÆ÷µÄ½Ó¿Ú·½·¨£¬ÓÃÓÚÖ´ĞĞ¹ıÂËÒµÎñ
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
 		if (encoding != null) {
-			request.setCharacterEncoding(encoding); // ÉèÖÃÇëÇóµÄ±àÂë
-			response.setContentType("text/html; charset=" + encoding);// ÉèÖÃÓ¦´ğ¶ÔÏóµÄÄÚÈİÀàĞÍ£¨°üÀ¨±àÂë¸ñÊ½£©
+			request.setCharacterEncoding(encoding); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä±ï¿½ï¿½ï¿½
+			response.setContentType("text/html; charset=" + encoding);// ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½ï¿½ï¿½
 		}
-		chain.doFilter(request, response); // ´«µİ¸øÏÂÒ»¸ö¹ıÂËÆ÷
+		chain.doFilter(request, response); // ï¿½ï¿½ï¿½İ¸ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	}
 
 	public void destroy() {

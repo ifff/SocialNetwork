@@ -20,9 +20,9 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.neo4j.graphdb.Transaction;
 
-import com.actionForm.ShowGradesForm;
+
 import com.dao.AccountDAO;
-import com.dao.AcdemicDAO;
+
 import com.core.*;
 
 public class FileUpload extends HttpServlet {
@@ -30,7 +30,9 @@ public class FileUpload extends HttpServlet {
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		
-		request.setCharacterEncoding("utf-8");	
+		request.setCharacterEncoding("GBK");	
+//        String t = request.getAttribute("content");
+//        System.out.println("get text:"+t);
 		String action = request.getParameter("action");
 		DiskFileItemFactory factory = new DiskFileItemFactory();
 		String path = request.getSession().getServletContext().getRealPath("/upload/");
@@ -69,7 +71,7 @@ public class FileUpload extends HttpServlet {
 					if (action.equals("uploadAvatar")) {  
 						String filename = "avatar.png";
 						item.write(new File(path, filename));
-						accountDAO.getPersonalStatuses(id); // need to be removed
+//						accountDAO.getPersonalStatuses(id); // need to be removed
 //						boolean error = false;	
 //						if (!error)
 //							request.getRequestDispatcher("result.jsp?para=1").forward(request, response);
@@ -81,11 +83,17 @@ public class FileUpload extends HttpServlet {
 //				        String id = chStr.filterStr(accountForm.getId());
 //				        String pwd = chStr.filterStr(accountForm.getPwd());
 //				        System.out.println("User:"+id+",passwd:"+pwd);
-				        String text = "HELLO";
+				        String text = chStr.filterStr(request.getAttribute("content").toString());
+				        System.out.println("text:"+text);
 				        long current = new Date().getTime();
-				        String picturePath = "upload/" + id + "/" + String.valueOf(current); 
+				        String filename = String.valueOf(current)+".png";
+				        item.write(new File(path, filename));
+				        String picturePath = "upload/" + id + "/" + filename; 
 				        accountDAO.postStatus(id, text, picturePath);
+				        //request.getRequestDispatcher("home.jsp?").forward(request, response);
+				        response.sendRedirect("home.jsp?id="+id);
 					}
+
 				}
 			}	
 		}
